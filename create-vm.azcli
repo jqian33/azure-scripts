@@ -1,0 +1,38 @@
+## Commands use Azure CLI to provision a Linux VM
+
+# List resource groups
+az group list -o table
+
+# Create resource group
+az group create --name "demo" --location "centralus"
+
+# Create virtual network
+az network vnet create --resource-group "demo" --name "demo-vnet" --address-prefix "10.1.0.0/16" --subnet-name "demo-subnet-1" --subnet-prefix "10.1.1.0/24"
+
+# Create public IP address
+az network public-ip create --resource-group "demo" --name "demo-public-ip"
+
+# Create network security group
+az network nsg create --resource-group "demo" --name "demo-nsg"
+
+# Create network interface
+az network nic create --resource-group "demo" --name "demo-nic" --vnet-name "demo-vnet" --subnet "demo-subnet-1" --network-security-group "demo-nsg" --public-ip-address "demo-public-ip"
+
+# Create virtual machine
+az vm create --resource-group "demo" --location "centralus" --name "demo-vm" --nics "demo-nic" --image "rhel" --admin-username "demoadmin" --authentication-type "ssh" --generate-ssh-keys
+
+# Open port 22 to allow SSH 
+az vm open-port --resource-group "demo" --name "demo-vm" --port "22"
+
+# Grab public IP 
+az vm list-ip-addresses --name "demo-vm" --output table
+
+# List virtual machines status
+az vm list -d --output table
+
+# Stop a virtual machine
+az vm stop --resource-group "demo" --name "demo-vm"
+
+# Deallocate virtual machine
+az vm deallocate --resource-group "demo" --name "demo-vm"
+
